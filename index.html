@@ -83,7 +83,7 @@
 
                 let output = `${lines[0]}\n`;
                 picks.forEach(pick => {
-                    output += `${pick.date},${pick.visitor},${pick.time},${pick.person1},${pick.person2},${pick.person3},${pick.owner}\n`
+                    output += `${pick.date.toDateString()},${pick.visitor},${pick.time},${pick.person1},${pick.person2},${pick.person3},${pick.owner}\n`
                 })
 
                 document.getElementById('outputCsv').value = output
