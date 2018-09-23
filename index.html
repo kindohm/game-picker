@@ -1,0 +1,101 @@
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: sans-serif
+        }
+    </style>
+</head>
+
+<body>
+
+    <h3>Input:</h3>
+    <p>Remember dates must be in MM/DD/YYYY format. Example line:</p>
+    <pre><code>10/20/2018,WHALERS,7:00 PM,8,5,7,</code></pre>
+    <textarea id="inputCsv" style="width: 90%; height: 100px"></textarea>
+    <p>
+        <button onclick="run()">Run</button>
+    </p>
+    <h3>Output:</h3>
+    <textarea id="outputCsv" style="width: 90%; height: 100px"></textarea>
+    <script>
+
+        (function () {
+
+            const allGamesOwned = picks => {
+                return !picks.find(pick => {
+                    return pick.owner === null
+                })
+            }
+
+            window.run = () => {
+
+                const input = document.getElementById('inputCsv');
+                const lines = input.value.split('\n')
+
+                let header = lines[0].split(',')
+                const names = {
+                    person1: header[3],
+                    person2: header[4],
+                    person3: header[5]
+                }
+
+                let picks = lines.slice(1).map(line => {
+                    const parts = line.split(',');
+                    const datePart = parts[0];
+                    console.log('datePart', datePart);
+                    return {
+                        date: new Date(datePart),
+                        visitor: parts[1],
+                        time: parts[2],
+                        person1: parts[3],
+                        person2: parts[4],
+                        person3: parts[5],
+                        owner: null
+                    }
+                })
+
+                let pickerIndex = 1;
+                let safety = 0;
+                while (!allGamesOwned(picks)) {
+
+                    let nextPick = picks.filter(pick => {
+                        return !pick.owner;
+                    }).sort((a, b) => {
+                        const valA = a[`person${pickerIndex}`]
+                        const valB = b[`person${pickerIndex}`]
+                        if (valA < valB) return -1;
+                        if (valB > valA) return 1;
+                        return 0
+                    })[0]
+
+                    nextPick.owner = names[`person${pickerIndex}`]
+                    console.log(nextPick)
+
+                    pickerIndex++;
+                    if (pickerIndex > 3) pickerIndex = 1
+                    safety++
+                    if (safety > 100) {
+                        throw "nope!"
+                    }
+                }
+
+                let output = `${lines[0]}\n`;
+                picks.forEach(pick => {
+                    output += `${pick.date},${pick.visitor},${pick.time},${pick.person1},${pick.person2},${pick.person3},${pick.owner}\n`
+                })
+
+                document.getElementById('outputCsv').value = output
+
+            }
+
+
+
+
+        })()
+
+    </script>
+</body>
+
+</html>
